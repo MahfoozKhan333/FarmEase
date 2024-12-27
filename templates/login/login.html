@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FarmEase-Login</title>
-    <link rel="stylesheet" href="login.css">
+    <!--<link rel="stylesheet" href="login.css">-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
+
 </head>
 
 <body>
@@ -17,7 +20,9 @@
 
                 <div class="login-image-container">
                     <h1 class="login-left-heading">Healthy Herds, Prosperous Farmers</h1>
-                    <img src="../Assets/farmerUncle-copy.jpg" width="400px" height="400px" class="login-image">
+                    <img src="{{ url_for('static', filename='Assets/farmerUncle-copy.jpg') }}" width="400px" height="400px" class="login-image">
+
+
                     <div class="small-msg">
                         Welcome back
                     </div>

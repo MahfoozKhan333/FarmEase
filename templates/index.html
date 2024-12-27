@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FarmEase</title>
-    <link rel="stylesheet" href="index.css">
+    <!--<link rel="stylesheet" href="index.css">-->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     
 </head>
 <body>
@@ -15,7 +16,7 @@
         <nav class="navbar-container">
         
         <div class="logo-section">
-            <img src="./Assets/logo.jpg" width="80px" height="80px">
+            <img src="{{ url_for('static', filename='Assets/logo.jpg') }}" width="80px" height="80px">
             <h1>FarmEase</h1>
         </div>
         
@@ -28,7 +29,7 @@
 
     
     <div class="nav-button">
-        <button class="login">Login</button>
+        <a href="{{ url_for('login') }}" class="login">Login</a>
         <button class="signup">Signup</button>
     </div>
 
@@ -83,12 +84,12 @@
                 <div class="gallery-left-quote-container">
                     <p class="pt-serif-regular-italic">With FarmEase, nuture your cattle like family.</p>
                 </div>
-                <img src="./Assets/farmerUncle2.jpg" class="farmer">
+                <img src="{{ url_for('static', filename='Assets/farmerUncle.jpg') }}" class="farmer">
 
             </div>
 
             <div class="gallery-right">
-                <img src="./Assets/girCow.jpg" class="cow">
+                <img src="{{ url_for('static', filename='Assets/girCow.jpg') }}" class="cow">
                 <div class="gallery-right-quote-container">
                     <p class="pt-serif-regular-italic">With FarmEase, nuture your cattle like family.</p>
                 </div>
@@ -102,7 +103,7 @@
         
             <div class="mission-photo">
                 <div>
-                    <img src="./Assets/mission-photo.png"  class="mission-cow-photo" >
+                    <img src="{{ url_for('static', filename='Assets/mission-photo.png') }}"  class="mission-cow-photo" >
                 </div>
                 
             </div>

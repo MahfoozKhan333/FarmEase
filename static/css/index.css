@@ -111,6 +111,7 @@
     border-radius: 5px;
     padding: 10px;
     color: white;
+    text-decoration: none;
 }
 .signup{
     /* #b7950b */
@@ -156,7 +157,7 @@
     position: absolute;
     bottom:0;
     left:20px;
-    animation: moveAndFade 5s linear infinite;
+    animation: moveAndFade 12s linear  infinite;
 
 }
 /* @keyframes moveTractor {
@@ -172,11 +173,11 @@
       transform: translateX(-150%);
       opacity: 1; /* Fully visible */
     }
-    80% {
+    95% {
       opacity: 1; /* Stay visible while moving */
     }
     100% {
-      transform: translateX(400%);
+      transform: translateX(1090%);
       opacity: 0; /* Fade out */
     }
   }
