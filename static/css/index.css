@@ -115,7 +115,8 @@
 }
 .signup{
     /* #b7950b */
-    background-color:  #f5b041;
+    /* background-color:  #f5b041; */
+    background-color: #f39c12;
     color: white;
     padding: 10px;
     border-radius: 5px;
@@ -235,7 +236,8 @@
 }
 
 .explore-btn{
-    background-color: #f5b041;
+    background-color: #f39c12;
+    
     color:white;
     padding: 15px;
     border:none;
