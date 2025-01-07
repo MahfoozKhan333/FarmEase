@@ -1,11 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>FarmEase-Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 </head>
+
 <body>
-    
+    <div class="master-container">
+
+        <div class="universal-signup">
+
+            <div class="signup-left-background">
+
+                <div class="signup-image-container">
+                    <h1 class="signup-left-heading">Your Farm, Your Rules</h1>
+                    <img src="{{ url_for('static', filename='Assets/farmer3.jpg') }}" width="400px" height="400px" class="signup-image">
+
+                    <div class="small-msg">
+                        Join us Today!
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="signup-right">
+                <div class="signup-container">
+                    <form class="signup-form">
+                        <h2>Register</h2>
+                        <div class="form-grid">
+                           
+                            <div class="input-group">
+                                <label for="first_name">First Name</label>
+                                <input type="text" id="first_name" name="first_name" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="last_name">Last Name</label>
+                                <input type="text" id="last_name" name="last_name" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="mobile_number">Mobile Number</label>
+                                <input type="text" id="mobile_number" name="mobile_number" required>
+                            </div>
+                           
+                            <div class="input-group">
+                                <label for="password">Password</label>
+                                <input type="password" id="password" name="password" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="confirm_password">Confirm Password</label>
+                                <input type="password" id="confirm_password" name="confirm_password" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="username">Username</label>
+                                <input type="text" id="username" name="username" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="farm_name">Farm Name (Optional)</label>
+                                <input type="text" id="farm_name" name="farm_name">
+                            </div>
+                        </div>
+                        <div class="input-group full-width">
+                            <button type="submit" class="signup-btn">Register</button>
+                        </div>
+                        <p class="login-link">Already have an account?  <a href="{{ url_for('login') }}" class="login">Login</a></p>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
 </body>
+
 </html>
