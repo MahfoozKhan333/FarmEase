@@ -20,32 +20,32 @@ def index():
 
     return render_template("index.html")
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['GET','POST'])
 def register():
     auth_header = request.headers.get('Authorization')
     # if auth_header != VALID_TOKEN:
     #     return jsonify({"error": "Unauthorized"}), 401
     
     if request.method == 'POST':
-        try:
-            data = request.get_json()
-            farm_name = data['farm_name']
-            username = data['username']
-            password = data['password']
-            email = data['email']
-            first_name = data['first_name']
-            last_name = data['last_name']
-            mobile_number = data['mobile_number']
-        except (TypeError, KeyError):
-            return jsonify({"error": "Invalid JSON payload"}), 400
+        # try:
+        #     data = request.get_json()
+        #     farm_name = data['farm_name']
+        #     username = data['username']
+        #     password = data['password']
+        #     email = data['email']
+        #     first_name = data['first_name']
+        #     last_name = data['last_name']
+        #     mobile_number = data['mobile_number']
+        # except (TypeError, KeyError):
+        #     return jsonify({"error": "Invalid JSON payload"}), 400
     
-        # farm_name = request.form['farm_name']
-        # username = request.form['username']
-        # password = request.form['password']
-        # email = request.form['email']
-        # first_name = request.form['first_name']
-        # last_name = request.form['last_name']
-        # mobile_number = request.form['mobile_number']
+        farm_name = request.form['farm_name']
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        mobile_number = request.form['mobile_number']
 
         # Hash the password for security
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -73,23 +73,10 @@ def register():
         except Exception as e:
             print(f"Error inserting user: {e}")
         return jsonify({"error": "An error occurred during registration"}), 500
-        
-        # Insert user data into the collection
-        # db.users.insert_one({
-        #     'farm_name': farm_name,
-        #     'username': username,
-        #     'password': hashed_password,
-        #     'email': email,
-        #     'first_name': first_name,
-        #     'last_name': last_name,
-        #     'mobile_number': mobile_number
-        # })
-        # print("I am in register")
-        # return redirect(url_for('login'))
 
     return render_template('register/register.html')
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -113,7 +100,54 @@ def login():
 @app.route('/dashboard')
 def dashboard():
     # Dashboard content here
-    return "Welcome to the dashboard!"
+    return render_template('dashboard/dashboard.html')
+
+# @app.route('/dashboard/addAnimal')
+# def addAnimal():
+#     # Dashboard content here
+#     return render_template('addAnimal/addAnimal.html')
+
+@app.route('/dashboard/addAnimal', methods=['GET', 'POST'])
+def addAnimal():
+    if request.method == 'POST':
+        try:
+            # Retrieve data from the form
+            animal_id = request.form['animalid']
+            date_of_birth = request.form['dateOfBirth']
+            breed = request.form['breed']
+            weight = request.form['weight']
+            food = request.form['food']
+            milk_production = request.form['milkProduction']
+            
+            # Validate the required fields
+            if not animal_id or not date_of_birth or not breed or not weight or not food or not milk_production:
+                return jsonify({"error": "All fields are required."}), 400
+
+            # Connect to the database
+            client = connectDB.connect_to_mongodb()
+            db = client['cattle_farm']
+
+            # Check if the animal_id already exists in the database
+            if db.animals.find_one({'animal_id': animal_id}):
+                return jsonify({"error": "Animal with this ID already exists."}), 409
+
+            # Insert animal details into the 'animals' collection
+            db.animals.insert_one({
+                'animal_id': animal_id,
+                'date_of_birth': date_of_birth,
+                'breed': breed,
+                'weight': float(weight),  # Convert weight to float
+                'food': food,
+                'milk_production': float(milk_production)  # Convert milk production to float
+            })
+
+            return redirect(url_for('dashboard'))  # Redirect to the dashboard after successful addition
+
+        except Exception as e:
+            print(f"Error adding animal: {e}")
+            return jsonify({"error": "An error occurred while adding the animal."}), 500
+
+    return render_template('addAnimal/addAnimal.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
