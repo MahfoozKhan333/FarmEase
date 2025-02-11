@@ -7,49 +7,21 @@ def connect_to_mongodb():
         
         # Create the database
         db = client["cattle_farm"]  
+        print("Successfully connected to database.")
 
-        # # Users Collection Schema
-        users = db['users']
-        # users.insert_one({
-        #     # "_id": None,  # MongoDB ObjectId (or use custom ID)
-        #     "username": None,
-        #     "password": None,  # Password stored as a hashed value
-        #     "email": None,
-        #     "first_name": None,
-        #     "last_name": None,
-        #     "mobile_number":None
-        # })
+        # Initialize collections with optional schema validation (if necessary)
+        if "animals" not in db.list_collection_names():
+            db.create_collection("animals")
+            print("Collection 'animals' initialized.")
 
-        # # Animals Collection Schema
-        animals = db['animals']
-        # animals.insert_one({
-        #     # "_id": None,  # MongoDB ObjectId (or use custom ID)
-        #     "animal_id": None,
-        #     "user_id": None,  # Reference to the user's ID
-        #     "breed": None,
-        #     "food": None,
-        #     "weight": None,
-        #     "growth": None,
-        #     "milk_production": None,
-        #     "date_of_birth": None,
-        #     "last_updated": None
-        # })
+        if "users" not in db.list_collection_names():
+            db.create_collection("users")
+            print("Collection 'users' initialized.")
 
-        # Records Collection Schema
-        records = db['records']
-        # records.insert_one({
-        #     # "_id": None,  # MongoDB ObjectId (or use custom ID)
-        #     "animal_id": None,  # Reference to the animal's ID
-        #     "record_date": None,
-        #     "weight": None,
-        #     "milk_production": None
-        # })
-
-        print("Database and collections initialized with empty schema.")
         return client
 
     except Exception as e:
-        print("Error connecting to MongoDB or inserting data:", e)
+        print("Error connecting to MongoDB or intialising data:", e)
         raise e
 
 # Connect to MongoDB and initialize the schema
