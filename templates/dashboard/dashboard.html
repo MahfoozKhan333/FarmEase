@@ -15,7 +15,9 @@
             <ul>
                 <li>Add Animal</li>
                 <li>Edit Animal</li>
-                <li>View Analysis</li>
+                <li>
+                <a href="{{url_for('analysis')}}">View Analysis</a>
+                </li>
             </ul>
         </div>
 
@@ -23,6 +25,7 @@
         <div class="main-content">
             <div class="header">Dashboard</div>
             <a href="{{url_for('addAnimal')}}">Add Animal</a>
+            <a href="{{url_for('analysis')}}">View Analysis</a>
         </div>
     </div>
 </body>

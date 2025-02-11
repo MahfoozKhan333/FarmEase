@@ -1,6 +1,11 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for
 import bcrypt
 import connectDB
+from pymongo import MongoClient
+import matplotlib.pyplot as plt
+import io
+import base64
+
 
 app = Flask(__name__)
 
@@ -27,25 +32,19 @@ def register():
     #     return jsonify({"error": "Unauthorized"}), 401
     
     if request.method == 'POST':
-        # try:
-        #     data = request.get_json()
-        #     farm_name = data['farm_name']
-        #     username = data['username']
-        #     password = data['password']
-        #     email = data['email']
-        #     first_name = data['first_name']
-        #     last_name = data['last_name']
-        #     mobile_number = data['mobile_number']
-        # except (TypeError, KeyError):
-        #     return jsonify({"error": "Invalid JSON payload"}), 400
     
-        farm_name = request.form['farm_name']
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        mobile_number = request.form['mobile_number']
+        farm_name = request.form.get('farm_name')
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        email = request.form.get('email')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        mobile_number = request.form.get('mobile_number')
+
+        if(password != confirm_password):
+            return jsonify({"error": "Password and confirm Passowrd does not match"}), 409
+
 
         # Hash the password for security
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -76,11 +75,12 @@ def register():
 
     return render_template('register/register.html')
 
+
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
 
         # Get the database object
         client = connectDB.connect_to_mongodb() 
@@ -95,7 +95,8 @@ def login():
         else:
             return "Invalid username or password"
 
-    return render_template('login/login.html')
+    return render_template('login/login.html')    
+
 
 @app.route('/dashboard')
 def dashboard():
@@ -148,6 +149,154 @@ def addAnimal():
             return jsonify({"error": "An error occurred while adding the animal."}), 500
 
     return render_template('addAnimal/addAnimal.html')
+
+def create_chart_image(chart_type, data, labels=None, xlabel=None, ylabel=None):
+    """Creates a chart image using Matplotlib and returns it as a base64 encoded string."""
+    plt.figure()  # Create a new figure for each chart
+
+    if chart_type == 'box':
+        plt.boxplot(data.values())  # Assuming data is a dictionary like {'Category1': [values], ...}
+        plt.xticks(range(1, len(data) + 1), data.keys())  # Set x-axis labels
+    elif chart_type == 'scatter':
+        x, y = zip(*data)  # Unpacking tuples into two separate lists
+        plt.scatter(x, y)
+    elif chart_type == 'bar':
+        plt.bar(labels, data) # Assuming data is a list of values
+        plt.xticks(rotation=45, ha='right') # Rotate x-axis labels for better readability if needed
+
+    plt.xlabel(xlabel or "X-axis")
+    plt.ylabel(ylabel or "Y-axis")
+    plt.title(f"{xlabel} vs. {ylabel}") # Set title based on labels
+
+    img = io.BytesIO()
+    plt.savefig(img, format='png')  # Save chart to in-memory buffer
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()  # Encode to base64
+    plt.close() # Close the figure to free memory
+    return plot_url
+
+@app.route('/dashboard/analysis')
+def analysis():
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client["cattle_farm"]
+    animals = list(db.animals.find())
+    print("Animals: ", animals)
+
+    valid_animals = [
+        a for a in animals if a.get('_id') and a.get('weight') and a.get('milk_production')
+    ]
+
+    weight_growth_data = {}
+    weight_milk_data = []
+    food_milk_data = {}
+
+    for animal in valid_animals:
+        # 1. Weight vs. Growth
+        growth = animal.get("growth", "Unknown")
+        if growth not in weight_growth_data:
+            weight_growth_data[growth] = []
+        weight_growth_data[growth].append(animal["weight"])
+
+        # 2. Weight vs. Milk Production (Scatter Plot)
+        weight_milk_data.append((animal["weight"], animal["milk_production"]))
+
+        # 3. Food Type vs. Milk Production
+        food_str = animal.get("food", "")
+        if food_str:
+            foods = food_str.split(", ")  # Split multiple food types
+            for food in foods:
+                if food not in food_milk_data:
+                    food_milk_data[food] = []
+                food_milk_data[food].append(animal["milk_production"])
+
+    # Create charts as images
+    weight_growth_chart = create_chart_image('box', weight_growth_data, xlabel='Growth', ylabel='Weight')
+    weight_milk_chart = create_chart_image('scatter', weight_milk_data, xlabel='Weight', ylabel='Milk Production')
+    food_milk_chart = create_chart_image('box', food_milk_data, xlabel='Food', ylabel='Milk Production')
+
+    client.close()
+
+    return render_template('analysis/analysis.html', 
+                           weight_growth_chart=weight_growth_chart,
+                           weight_milk_chart=weight_milk_chart,
+                           food_milk_chart=food_milk_chart)
+
+
+# @app.route('/analysis')
+# def view_analysis():
+#     return render_template('analysis.html')
+
+# def create_chart_image(chart_type, data, labels=None, xlabel=None, ylabel=None):
+#     """Creates a chart image using Matplotlib and returns it as a base64 encoded string."""
+#     plt.figure()  # Create a new figure for each chart
+
+#     if chart_type == 'box':
+#         plt.boxplot(data.values())  # Assuming data is a dictionary like {'Category1': [values], ...}
+#         plt.xticks(range(1, len(data) + 1), data.keys())  # Set x-axis labels
+#     elif chart_type == 'scatter':
+#         x = [point['x'] for point in data]
+#         y = [point['y'] for point in data]
+#         plt.scatter(x, y)
+#     elif chart_type == 'bar':
+#         plt.bar(labels, data) # Assuming data is a list of values
+#         plt.xticks(rotation=45, ha='right') # Rotate x-axis labels for better readability if needed
+
+#     plt.xlabel(xlabel or "X-axis")
+#     plt.ylabel(ylabel or "Y-axis")
+#     plt.title(f"{xlabel} vs. {ylabel}") # Set title based on labels
+
+#     img = io.BytesIO()
+#     plt.savefig(img, format='png')  # Save chart to in-memory buffer
+#     img.seek(0)
+#     plot_url = base64.b64encode(img.getvalue()).decode()  # Encode to base64
+#     plt.close() # Close the figure to free memory
+#     return plot_url
+
+# @app.route('/dashboard/analysis')
+# def analysis():
+#     client = MongoClient("mongodb://localhost:27017/")
+#     db = client["cattle_farm"]
+#     animals = list(db.animals.find())
+#     print("Animals: ", animals)
+
+#     valid_animals = [
+#             a for a in animals if a.get('_id') and a.get('weight') and a.get('milk_production')
+#         ]
+
+#     weight_growth_data = {}
+#     weight_milk_data = []
+#     food_milk_data = {}
+
+#     for animal in valid_animals:
+#             # 1. Weight vs. Growth
+#             growth = animal.get("growth", "Unknown")
+#             if growth not in weight_growth_data:
+#                 weight_growth_data[growth] = []
+#             weight_growth_data[growth].append(animal["weight"])
+
+#             # 2. Weight vs. Milk Production (Scatter Plot)
+#             weight_milk_data.append((animal["weight"], animal["milk_production"]))
+
+#             # 3. Food Type vs. Milk Production
+#             food_str = animal.get("food", "")
+#             if food_str:
+#                 foods = food_str.split(", ")  # Split multiple food types
+#                 for food in foods:
+#                     if food not in food_milk_data:
+#                         food_milk_data[food] = []
+#                     food_milk_data[food].append(animal["milk_production"])
+
+#     # Create charts as images
+#     weight_growth_chart = create_chart_image('box', weight_growth_data, xlabel='Growth', ylabel='Weight')
+#     weight_milk_chart = create_chart_image('scatter', weight_milk_data, xlabel='Weight', ylabel='Milk Production')
+#     food_milk_chart = create_chart_image('box', food_milk_data, xlabel='Food', ylabel='Milk Production')
+
+#     client.close()
+
+#     return render_template('analysis/analysis.html', 
+#                            weight_growth_chart=weight_growth_chart,
+#                            weight_milk_chart=weight_milk_chart,
+#                            food_milk_chart=food_milk_chart)
 
 if __name__ == "__main__":
     app.run(debug=True)
