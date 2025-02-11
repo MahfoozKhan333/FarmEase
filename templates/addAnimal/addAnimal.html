@@ -3,67 +3,85 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=\, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Animal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/addAnimal.css')}}"></link>
 </head>
 
 <body>
-    <!-- Add Animal Form -->
-    <div class="form-container">
-        
-        <h2 class="title">Add Animal</h2>
-
-        <form>
-
-            <div class="form-main">
-
-                <div class="form-flex">
-
-                    <div class="form-group">
-                        <label for="animalid">Animal ID</label>
-                        <input type="text" id="animalid" name="animalid" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dateOfBirth">Date of Birth</label>
-                        <input type="date" id="dateOfBirth" name="dateOfBirth" required>
-                    </div>
-
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-container">
+            <h2 class="title">
+                <img src="{{ url_for('static', filename='Assets/title cow.jpg') }}" width="90px">
+                Add Animal Details
+                <img src="{{ url_for('static', filename='Assets/brown cow.jpg') }}" width="80px">
+            </h2>
+            <form method="post" action="">
+                <div class="form-group">
+                    <label for="animalid">Animal ID</label>
+                    <input type="text" id="animalid" name="animalid" placeholder="Enter Animal ID" required>
                 </div>
-
+                <div class="form-group">
+                    <label for="dateOfBirth">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                </div>
+                <div class="form-group">
+                    <label for="breed">Breed</label>
+                    <input type="text" id="breed" name="breed" placeholder="Enter Breed" required>
+                </div>
                 <div class="form-flex">
-                    <div class="form-group">
-                        <label for="breed">Breed</label>
-                        <input type="text" id="breed" name="breed" required>
-                    </div>
+
                     <div class="form-group">
                         <label for="weight">Weight (kg)</label>
-                        <input type="number" id="weight" name="weight" required>
+                        <input type="number" id="weight" name="weight" placeholder="Enter Weight" required>
                     </div>
-
+                    <div class="form-group">
+                        <label for="food">Food</label>
+                        <input type="text" id="food" name="food" placeholder="Enter Food" required>
+                    </div>
 
                 </div>
 
                 <div class="form-flex">
-                    <div class="form-group">
-                        <label for="food">Food</label>
-                        <input type="text" id="food" name="food" required>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="milkProduction">Milk Production (liters)</label>
-                        <input type="number" id="milkProduction" name="milkProduction" required>
-                    </div>
-
+                <div class="form-group">
+                    <label for="milkProduction">Milk Production (liters)</label>
+                    <input type="number" id="milkProduction" name="milkProduction" placeholder="Enter Milk Production" required>
                 </div>
-              
+                <div class="form-group">
+                    <label for="growth">Growth</label>
+                    <select id="growth" name="growth" required>
+                        <option value="">--Select Growth--</option>
+                        <option value="good">Good</option>
+                        <option value="excellent">Excellent</option>
+                        <option value="average">Average</option>
+                        <option value="bad">Bad</option>
+                    </select>
+                </div>
                 
-                <button type="submit" class="submit">Add Animal</button>
-                
-
             </div>
-            
-        </form>
+                <button type="submit" class="submit">Add Animal</button>
+            </form>
+        </div>
+
+        <!-- Guidelines Section -->
+        <div class="guidelines-container">
+            <h2 class="titleGuideline">
+                <img src="{{ url_for('static', filename='Assets/light-bulb.png') }}"  width ="50px">
+                Guidelines
+            </h2>
+            <ul class="guidelines">
+                <li>Ensure that the <strong>Animal ID</strong> is unique and follows the predefined format (e.g., ANM001).</li>
+                <li>Enter the <strong>Date of Birth</strong> in the correct format (YYYY-MM-DD).</li>
+                <li>Provide the <strong>Breed</strong> of the animal (e.g., Jersey, Holstein).</li>
+                <li>Accurately record the <strong>Weight</strong> of the animal in kilograms (kg).</li>
+                <li>Specify the <strong>type of food</strong> the animal is consuming (e.g., grass, grains).</li>
+                <li>Fill in the <strong>Milk Production</strong> in liters if the animal is a dairy-producing one. Enter 0 if not applicable.</li>
+                <li>Select the animal’s <strong>Growth Status</strong> from the dropdown (e.g., Excellent, Good, Average, Bad).</li>
+                <li>Review all fields before submitting the form to ensure accuracy.</li>
+            </ul>
+        </div>
     </div>
 </body>
 

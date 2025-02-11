@@ -108,27 +108,30 @@ def dashboard():
 #     # Dashboard content here
 #     return render_template('addAnimal/addAnimal.html')
 
+
 @app.route('/dashboard/addAnimal', methods=['GET', 'POST'])
 def addAnimal():
     if request.method == 'POST':
         try:
             # Retrieve data from the form
-            animal_id = request.form['animalid']
-            date_of_birth = request.form['dateOfBirth']
-            breed = request.form['breed']
-            weight = request.form['weight']
-            food = request.form['food']
-            milk_production = request.form['milkProduction']
-            
-            # Validate the required fields
-            if not animal_id or not date_of_birth or not breed or not weight or not food or not milk_production:
+            animal_id = request.form.get('animalid')
+            date_of_birth = request.form.get('dateOfBirth')
+            breed = request.form.get('breed')
+            weight = request.form.get('weight')
+            food = request.form.get('food')
+            milk_production = request.form.get('milkProduction')
+            growth = request.form.get('growth')  # Retrieve the growth value
+
+            # Validate required fields
+            required_fields = [animal_id, date_of_birth, breed, weight, food, milk_production, growth]
+            if not all(required_fields):
                 return jsonify({"error": "All fields are required."}), 400
 
             # Connect to the database
             client = connectDB.connect_to_mongodb()
             db = client['cattle_farm']
 
-            # Check if the animal_id already exists in the database
+            # Check if the animal_id already exists
             if db.animals.find_one({'animal_id': animal_id}):
                 return jsonify({"error": "Animal with this ID already exists."}), 409
 
@@ -139,8 +142,10 @@ def addAnimal():
                 'breed': breed,
                 'weight': float(weight),  # Convert weight to float
                 'food': food,
-                'milk_production': float(milk_production)  # Convert milk production to float
+                'milk_production': float(milk_production),  # Convert milk production to float
+                'growth': growth
             })
+            print(f"Animal added successfully: {animal_id}")
 
             return redirect(url_for('dashboard'))  # Redirect to the dashboard after successful addition
 
@@ -149,6 +154,7 @@ def addAnimal():
             return jsonify({"error": "An error occurred while adding the animal."}), 500
 
     return render_template('addAnimal/addAnimal.html')
+
 
 def create_chart_image(chart_type, data, labels=None, xlabel=None, ylabel=None):
     """Creates a chart image using Matplotlib and returns it as a base64 encoded string."""
